@@ -11,6 +11,7 @@ rust-version = "1.75"
 description = "Clean and customizable greeter for greetd"
 repository = "https://github.com/rharish101/ReGreet/"
 license = "GPL-3.0-or-later"
+strip = "symbols"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

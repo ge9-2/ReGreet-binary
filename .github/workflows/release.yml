@@ -1,0 +1,32 @@
+name: Manual release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source ref
+        uses: actions/checkout@v4
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: latest
+      - name: Setup build deps
+        run: |
+          sudo apt update
+          sudo apt install -y libglib2.0-dev libpango1.0-dev libgdk-pixbuf-2.0-dev libgraphene-1.0-dev libgtk-4-dev
+      - uses: taiki-e/upload-rust-binary-action@v1
+        env:
+          RUSTFLAGS: '-Clink-arg=-L/usr/lib/x86_64-linux-gnu -Clink-arg=-Wl,--allow-shlib-undefined' 
+        with:
+          target: x86_64-unknown-linux-gnu.2.16
+          bin: regreet
+          build-tool: cargo-zigbuild
+          token: ${{ secrets.GITHUB_TOKEN }}
