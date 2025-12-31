@@ -1,0 +1,35 @@
+name: Manual release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source ref
+        uses: actions/checkout@v4
+      - name: Setup Zig
+        uses: Rul1an/zig-cross-compile-action@v1
+        with:
+          version: 0.13.0
+          target: x86_64-linux-gnu.2.3
+      - name: Setup build deps
+        run: |
+          sudo apt update
+          sudo apt install -y libglib2.0-dev libpango1.0-dev libgdk-pixbuf-2.0-dev libgraphene-1.0-dev libgtk-4-dev
+          cargo install --locked cargo-zigbuild
+      - name: Build
+        run: |
+          RUSTFLAGS='-L /usr/lib/x86_64-linux-gnu/' cargo zigbuild --target=x86_64-unknown-linux-gnu.2.16 --release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/x86_64-unknown-linux-gnu/release/regreet
+            
